@@ -17,7 +17,7 @@ def get_user_input(integers_only):
         operator_value = None # Initialize to None
         if operation == 'custom':
             print("Warning: Using 'eval()' for custom functions can be a security risk if input is not trusted.")
-            operator_value = input("Enter a custom function (e.g., x * 2 + 1, where 'x' is the previous number): ").strip()
+            operator_value = input("Enter a custom function (e.g., x * 2 + 1, where 'x' = previous number): ").strip()
             # Basic validation for custom function to ensure 'x' is present
             if 'x' not in operator_value:
                 print("Custom function must include 'x' as the placeholder for the previous number.")
@@ -50,7 +50,7 @@ def get_user_input(integers_only):
             except ValueError:
                 print("Invalid bound value. Bounds must be numbers.")
                 # Decide if we should stop or just ignore bounds
-                print("Ignoring divergence bounds due to invalid input.")
+                print("Invalid input. Ignoring divergence bounds.")
                 upper_bound = None
                 lower_bound = None
 
@@ -85,7 +85,7 @@ def generate_sequence(start, op, op_val, length, upper_bound=None, lower_bound=N
             current_number /= op_val
         elif op == 'custom':
             try:
-                # 'x' is the variable representing the previous number in the sequence
+                # 'x' = variable representing previous number in sequence
                 x = current_number
                 current_number = eval(op_val, {"x": x})
             except Exception as e:
@@ -98,12 +98,12 @@ def generate_sequence(start, op, op_val, length, upper_bound=None, lower_bound=N
         # Divergence Detection
         if upper_bound is not None and current_number > upper_bound:
             print(f"\nDivergence detected: {current_number} exceeded upper bound of {upper_bound}.")
-            break # Do not append the violating number
+            break # Don't append violating number
         if lower_bound is not None and current_number < lower_bound:
             print(f"\nDivergence detected: {current_number} exceeded lower bound of {lower_bound}.")
-            break # Do not append the violating number
+            break # Don't append violating number
 
-        # Convergence and Cycle Detection
+        # Convergence, Cycle Detection
         if current_number == 0:
             print(f"\nConvergence detected: Sequence reached 0 after {previous_number}.")
             sequence.append(current_number)
@@ -143,7 +143,7 @@ def main():
     
     if inputs:
         start_number, operation, operator_value, length, filename, upper_bound, lower_bound = inputs
-        integers_only = args.intonly # Use the flag from argparse
+        integers_only = args.intonly # Use flag from argparse
         
         sequence = generate_sequence(start_number, operation, operator_value, length, upper_bound, lower_bound, integers_only)
         
