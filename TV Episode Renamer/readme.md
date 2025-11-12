@@ -1,17 +1,16 @@
-This script queries TVMaze's API and auto-renames supported files, helping you structure media files in a human-readable format. It'll automatically retrieve accurate episode information and can effortlessly process multiple subdirectories. 
-
-It'll also create a backup file for cowards.
+This script queries TVMaze's API, auto-retrieves episode information, and renames supported files, subdirectories included. Script creates a backup and supports rollback in the event of erroneous retrieval or renaming.
 
 Files containing information like _"S01E01"_ 
 
 **or named things like:** 
+
 _"Showname.S01E01.Uploader.Group.Site.mp4"
 "Showname.S01E01.Episodename.Site.mp4"_
 
-**Become:**
+**Become, respectively:**
 
 "S01E01 - The Beginning.mp4" and 
-"S02E02 - Two's a Crowd.mp4", respectively.
+"S02E02 - Two's a Crowd.mp4"
 
 It can be ran from a parent directory, ShowName, containing folders for Seasons 1-10. 
 From here, it'll process subfolders automatically. If none are present, it'll process _only the files in its base folder._
