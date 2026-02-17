@@ -82,7 +82,10 @@ def generate_sequence(start, op, op_val, length, upper_bound=None, lower_bound=N
             if op_val == 0:
                 print("Error: Division by zero is not allowed.")
                 return None
-            current_number /= op_val
+            if integers_only:
+                current_number //= op_val
+            else:
+                current_number /= op_val
         elif op == 'custom':
             try:
                 # 'x' = variable representing previous number in sequence
