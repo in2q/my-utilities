@@ -67,7 +67,8 @@ def get_user_input(integers_only):
 def generate_sequence(start, op, op_val, length, upper_bound=None, lower_bound=None, integers_only=False):
     """Generates the numerical sequence with convergence, cycle, and divergence detection."""
     sequence = [start]
-    seen_numbers = {start}
+    seen_numbers = [start] if not integers_only else None
+    seen_set = {start} if integers_only else None
     current_number = start
 
     for _ in range(length - 1):
@@ -112,13 +113,22 @@ def generate_sequence(start, op, op_val, length, upper_bound=None, lower_bound=N
             sequence.append(current_number)
             break
         
-        if current_number in seen_numbers:
-            print(f"\nCycle detected: Number {current_number} repeated. Sequence is entering a loop.")
-            sequence.append(current_number)
-            break
-            
+        if integers_only:
+            if current_number in seen_set:
+                print(f"\nCycle detected: Number {current_number} repeated. Sequence is entering a loop.")
+                sequence.append(current_number)
+                break
+        else:
+            if any(abs(current_number - seen) <= 1e-9 for seen in seen_numbers):
+                print(f"\nCycle detected: Number {current_number} repeated (within tolerance). Sequence is entering a loop.")
+                sequence.append(current_number)
+                break
+
         sequence.append(current_number)
-        seen_numbers.add(current_number)
+        if integers_only:
+            seen_set.add(current_number)
+        else:
+            seen_numbers.append(current_number)
     
     return sequence
 
