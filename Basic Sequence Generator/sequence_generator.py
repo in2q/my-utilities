@@ -1,6 +1,39 @@
 import csv
 import argparse
+import ast
 import math
+
+SAFE_FUNCTIONS = {
+    "abs": abs, "round": round, "min": min, "max": max,
+    "pow": pow, "int": int, "float": float,
+    "sqrt": math.sqrt, "log": math.log, "log2": math.log2,
+    "log10": math.log10, "sin": math.sin, "cos": math.cos,
+    "tan": math.tan, "pi": math.pi, "e": math.e,
+    "floor": math.floor, "ceil": math.ceil,
+}
+
+ALLOWED_AST_NODES = (
+    ast.Expression, ast.BinOp, ast.UnaryOp, ast.Call, ast.Constant,
+    ast.Name, ast.Load,
+    ast.Add, ast.Sub, ast.Mult, ast.Div, ast.FloorDiv, ast.Mod, ast.Pow,
+    ast.USub, ast.UAdd,
+)
+
+def safe_eval(expr, x):
+    """Evaluate a math expression after validating its AST contains only safe nodes."""
+    try:
+        tree = ast.parse(expr, mode='eval')
+    except SyntaxError as e:
+        raise ValueError(f"Invalid syntax: {e}")
+
+    for node in ast.walk(tree):
+        if not isinstance(node, ALLOWED_AST_NODES):
+            raise ValueError(f"Disallowed expression element: {type(node).__name__}")
+        if isinstance(node, ast.Name) and node.id not in SAFE_FUNCTIONS and node.id != 'x':
+            raise ValueError(f"Unknown name: '{node.id}'")
+
+    namespace = {"x": x, "__builtins__": {}, **SAFE_FUNCTIONS}
+    return eval(compile(tree, "<custom>", "eval"), namespace)
 
 def get_user_input(integers_only):
     """Gets all the necessary inputs from the user."""
@@ -17,7 +50,6 @@ def get_user_input(integers_only):
 
         operator_value = None # Initialize to None
         if operation == 'custom':
-            print("Warning: Using 'eval()' for custom functions can be a security risk if input is not trusted.")
             operator_value = input("Enter a custom function (e.g., x * 2 + 1, where 'x' = previous number): ").strip()
             # Basic validation for custom function to ensure 'x' is present
             if 'x' not in operator_value:
@@ -90,19 +122,8 @@ def generate_sequence(start, op, op_val, length, upper_bound=None, lower_bound=N
                 current_number /= op_val
         elif op == 'custom':
             try:
-                # 'x' = variable representing previous number in sequence
-                x = current_number
-                allowed_names = {
-                    "x": x, "__builtins__": {},
-                    "abs": abs, "round": round, "min": min, "max": max,
-                    "pow": pow, "int": int, "float": float,
-                    "sqrt": math.sqrt, "log": math.log, "log2": math.log2,
-                    "log10": math.log10, "sin": math.sin, "cos": math.cos,
-                    "tan": math.tan, "pi": math.pi, "e": math.e,
-                    "floor": math.floor, "ceil": math.ceil,
-                }
-                current_number = eval(op_val, allowed_names)
-            except Exception as e:
+                current_number = safe_eval(op_val, current_number)
+            except (ValueError, Exception) as e:
                 print(f"Error evaluating custom function '{op_val}': {e}")
                 return None
         
