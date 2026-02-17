@@ -108,8 +108,12 @@ def generate_sequence(start, op, op_val, length, upper_bound=None, lower_bound=N
             break # Don't append violating number
 
         # Convergence, Cycle Detection
-        if current_number == 0:
-            print(f"\nConvergence detected: Sequence reached 0 after {previous_number}.")
+        if integers_only:
+            converged = current_number == previous_number
+        else:
+            converged = abs(current_number - previous_number) <= 1e-9
+        if converged:
+            print(f"\nConvergence detected: Sequence stabilized at {current_number} (previous: {previous_number}).")
             sequence.append(current_number)
             break
         
