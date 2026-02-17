@@ -1,5 +1,6 @@
 import csv
 import argparse
+import math
 
 def get_user_input(integers_only):
     """Gets all the necessary inputs from the user."""
@@ -91,7 +92,16 @@ def generate_sequence(start, op, op_val, length, upper_bound=None, lower_bound=N
             try:
                 # 'x' = variable representing previous number in sequence
                 x = current_number
-                current_number = eval(op_val, {"x": x})
+                allowed_names = {
+                    "x": x, "__builtins__": {},
+                    "abs": abs, "round": round, "min": min, "max": max,
+                    "pow": pow, "int": int, "float": float,
+                    "sqrt": math.sqrt, "log": math.log, "log2": math.log2,
+                    "log10": math.log10, "sin": math.sin, "cos": math.cos,
+                    "tan": math.tan, "pi": math.pi, "e": math.e,
+                    "floor": math.floor, "ceil": math.ceil,
+                }
+                current_number = eval(op_val, allowed_names)
             except Exception as e:
                 print(f"Error evaluating custom function '{op_val}': {e}")
                 return None
